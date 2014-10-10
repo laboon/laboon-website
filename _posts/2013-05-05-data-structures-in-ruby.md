@@ -1,0 +1,94 @@
+---
+title: Data Structures in Ruby - Proposed Table of Contents
+layout: default
+---
+
+I'm thinking of writing an ebook on Data Structures in Ruby.  Any feedback, thoughts or comments are greatly appreciated!  I've included my proposed table of contents below.
+
+Data Structures in Ruby
+
+```
+1. Intro
+2. Analysis of Data Structures
+  a. What is a data structure?
+  b. Understanding algorithms
+  c. Big-O notation (incl. big-O vs theta, omega)
+  d. Memory and Time Complexity
+  e. Inserting data
+  f. Retrieving data
+  g. Searching for data
+3. Primitive Types
+  a. What are primitive types?
+  b. What are they good for?
+  c. Numeric types
+  d. Strings & Symbols
+  e. Booleans
+  f. Objects
+4. Arrays
+  a. What are arrays?
+  b. What are they good for?
+  c. Basic arrays
+  d. Dynamic arrays
+5. Hashes (aka Maps, Associative Arrays, Dictionaries)
+  a. What are hashes?
+  b. What are they good for?
+  c. Concept of a hash – key, value
+  d. Implementations of hashes
+6. Lists
+  a. What are lists?
+  b. What are they good for?
+  c. Linked Lists
+  d. Doubly-linked lists
+  e. Unrolled lists
+  f. Self-organizing lists
+7. Sets
+  a. What are sets?
+  b. What are they good for?
+8. Stacks
+  a. What are stacks?
+  b. What are they good for?
+  c. Implementations – array vs. linked list
+9. Queues
+  a. What are queues?
+  b. What are they good for?
+  c. Queue implementations
+  d. Priority Queues
+10. Trees
+  a. What are trees?
+  b. What are they good for?
+  d. Binary Trees
+  e. Binary Search Trees
+  f. Red-black trees
+  g. Splay trees
+  h. B-trees
+11. Graphs
+  a. What are graphs?
+  b. What are they good for?
+  c. Sparse Graphs
+  d. Dense graphs
+  e. Matrix representations
+12. Tries
+  a. What are tries?
+  b. What are they good for?
+  c. Regular tries
+  d. Radix tries
+  e. Judy arrays
+13. Heaps
+  a. What are heaps?
+  b. What are they good for?
+  c. Regular heaps
+  d. Binary heaps
+  e. Fibonacci Heaps
+14. Multiway Trees
+  a. What are multiway trees?
+  b. What are they good for?
+  c. Ternary trees
+  d. And-or trees
+  e. Spaghetti stacks
+15. Probabilistic Data Structures
+  a. What are probabilistic data structures?
+  b. What are they good for?
+  c. Bloom Filters
+  d. Skip Lists
+  e. Locality-sensitive hashes
+```

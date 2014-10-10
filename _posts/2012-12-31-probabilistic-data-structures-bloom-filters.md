@@ -1,0 +1,140 @@
+---
+title: Probabilistic Data Structures, Part I - Bloom Filters
+layout: default
+---
+
+##What are Probabilistic Data Structures?
+
+Probabilistic data structures are, tautologically speaking, data structures which have a probabilistic component.  In other words, there is either a random component to them (as in during the construction of skip lists), or there is a chance that a retrieved value could be incorrect (as in Bloom filters, which I will detail below).
+
+Why would one want a data structure which could give you an incorrect value?  Well, as in most aspects of software engineering, it's because there are trade-offs involved.  In many probabilistic data structures, the big-O for access time or storage can be an order of magnitude smaller than an equivalent non-probabilistic data structure.  The price for this savings is the chance that a given value may be incorrect, or it may be impossible to determine the exact shape or size of a given data structure.  However, in many cases, these inconsistencies are either allowable or can trigger a broader, slower search on a complete data structure.  This hybrid approach allows many of the benefits of using probability, but can also ensure correctness of values.
+
+##Bloom Filters
+
+Perhaps the simplest example of a probabilistic data structure is a Bloom filter.  The core of a Bloom filter is a bit set (think of a long array of bits).  After creation, all bits in the bit set are set to 0.  Whenever a string is added to the filter, several hashing functions are run against the string, and the appropriate bit corresponding to the value of each hash are set to 1.  In order to check if a string exists in the filter, the same hash functions are run against the string.  If any of the bits are 0, then the string definitely does NOT exist in the filter.  If all of the bits are 1, it is PROBABLE that the string exists in the filter.  There is no way to tell that a string exists in the filter due to collisions – other words could map to the same bits.  Thus, while there can never be a false negative, there is a probability of false positives – strings which appear to exist in the filter, but actually do not. However, by modifying the size of the filter and the number of hash functions, one can reduce the probability of false posiitives.
+
+This is one of those concepts that, in my mind, is much easier to figure out by looking at at an example.  In my simple implentation, detailed below, the bit set is 23 bits long.  I have three (very, very simple) hash functions, add_hash, mult_hash, and xor_hash.  All three hash functions operate the same basic way – they take the ASCII values of each character in a string, apply a function (addition, multiplication, or bitwise XOR) from the first character to the last, and returns the result modulo the size of the filter.  Thus, each will give us a value from 0 to 22.  Now let's try adding a few words, examining the hash values and the filter bitset.
+
+```
+Adding cockatiel / hashes: 0, 19, 21
+10000000000000000001010
+Adding parrot / hashes: 20, 14, 10
+10000000001000100001110
+Adding sparrow / hashes: 0, 0, 7
+10000001001000100001110
+```
+
+Three strings were added to the Bloom filter – “cockatiel”, “parrot”, and “sparrow”.  The word “cockatiel” hashed to 0, 19,  and 21, so those locations on the bit set were set to 1.  Similarly, “parrot” hashed to 20, 14, and 10, so those bits were set to 1.  The string “sparrow” is a bit more interesting, though; not only did multiple hashes hash its value to 0, but 0 was already set to 1 by “cockatiel”!  This doesn't matter in a Bloom filter, though – if the bit is already 1, it just stays 1.  This shows why you can't delete items from a Bloom filter, since you don't know how many elements map to a given location (such as 0 in this example).  There is actually a modified version of this data structure, the counting Bloom filter, which has a count at each location instead of just a bit.  A counting Bloom filter can handle deletes, since you can just decrement the counter, and instead of looking for a “1″ at a given location, you look for any positive integer.  That's an article for another time, though.
+
+Let's add a few more strings to make a denser Bloom filter before moving on to checking for the existence of values.
+
+```
+Adding dove / hashes: 16, 10, 1
+11000001001000101001110
+Adding starling / hashes: 17, 0, 1
+11000001001000101101110
+```
+
+Now we're ready to start checking for the existence of strings!  Keep in mind that our final bit set, against which we'll be checking these values, is:
+
+```
+11000001001000101101110
+Checking cockatiel / hashes: 0, 19, 21
+true
+Checking parakeet / hashes: 17, 22, 6
+false
+Checking cockatoo / hashes: 0, 21, 17
+true
+```
+
+In order to check for existence, we just run the same hashes as we did earlier.  Since the bits at locations 0, 19, and 21 (the hash values for “cockatiel” are all set to 1, then “cockatiel” probably exists in the filter.  Looking at the hash values for “parakeet” (which we did not add to the filter), which are 17, 22, and 6, we see that although the bit at location 17 is set to 1, the bits at 22 and 6 are both 0.  Since at least one bit is 0, then “parakeet” definitely does not exist in this filter.   However, take a look at “cockatoo” – that string was never added to the filter, but it's showing that it exists!  This is a false positive, because 0 and 21 were set by “cockatiel” and 17 by “starling”.  Remember – there can be false positives, but never false negatives!
+
+That being said, all of this is only taking up 23 bits, which is less than 3 bytes, or smaller than one 32-bit integer (technically, in my implementation, it's taking up 23 integers, but that's just because I used integers instead of bits to make it easy to understand).  Storing these five strings in a hash, list, trie, tree or array would take up much, much more space.  Again, however, the price you pay is that there is always, always a chance of a false positives.  Using more and better hashing algorithms as well as a larger bit set can help to minimize these false positives.
+
+This also allows for very fast additions and lookups – basically, O(m) where m is the number of characters in the string to search for (since each hashing algorithm needs to look at each character).  Settings bits in a bit set or array is O(1), so the limiting factor from an algorithmic analysis point of view is the length of the string. With fast hashing, this means that you can very quickly add and check for the probable existence of strings – but you can never delete them from the filter.
+
+##A Simple Implementation of a Bloom Filter
+
+I always find looking at code to be the best way of understanding a new data structure, so I've made a small example Bloom filter in Ruby.
+
+```
+class BloomFilter
+
+  def initialize(size)
+     @filterSize = size
+     @filter = Array.new(@filterSize) { |index| 0 }
+  end
+
+  def add_hash(str)
+     count = 0
+     str.to_s.each_byte do |j|
+       count += j
+     end
+     count % @filterSize
+  end
+
+  def xor_hash(str)
+     count = 0
+     str.to_s.each_byte do |j|
+       count ^= j
+     end
+     count % @filterSize
+  end
+
+  def mult_hash(str)
+     count = 1
+     str.to_s.each_byte do |j|
+       count *= j
+     end
+     count % @filterSize
+  end
+
+  def add(str)
+     addHashVal = add_hash(str).to_i
+     multHashVal = mult_hash(str).to_i
+     xorHashVal = xor_hash(str).to_i
+     puts "Adding " + str.to_s + " / hashes: "+ addHashVal.to_s + ", " + multHashVal.to_s + ", " + xorHashVal.to_s
+     @filter[addHashVal] = 1
+     @filter[multHashVal] = 1
+     @filter[xorHashVal] = 1
+  end
+
+  def check(str)
+     addHashVal = add_hash(str).to_i
+     multHashVal = mult_hash(str).to_i
+     xorHashVal = xor_hash(str).to_i
+     puts "Checking " + str.to_s + " / hashes: "+ addHashVal.to_s + ", " + multHashVal.to_s + ", " + xorHashVal.to_s
+     if @filter[addHashVal] == 1 && @filter[multHashVal] == 1 && @filter[xorHashVal] == 1
+       true
+     else
+       false
+     end
+  end
+
+  def print_filter
+     @filter.each() { |i| print i}
+     print "\n"
+  end
+
+end
+
+puts "Bloom Filter test"
+bf = BloomFilter.new(23)
+bf.add "cockatiel"
+bf.print_filter
+bf.add "parrot"
+bf.print_filter
+bf.add "sparrow"
+bf.print_filter
+bf.add "dove"
+bf.print_filter
+bf.add "starling"
+bf.print_filter
+puts (bf.check "cockatiel").to_s
+puts (bf.check "parakeet").to_s
+puts (bf.check "cockatoo").to_s
+```
+
+Note-1: The example code is also available on my GitHub at [https://github.com/laboon/BloomFilter](https://github.com/laboon/BloomFilter "BloomFilter").
+
+Note-2: Please don't use my example code as production code!  It's maximized for understandability, not efficiency or minimization of false positives.  If you would like to use a Bloom filter in your project, I recommend the bloomfilter gem by Bryan Duxbury.

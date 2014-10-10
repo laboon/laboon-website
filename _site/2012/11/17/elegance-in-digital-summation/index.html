@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title> Elegance in Digit Summation |  Bill Laboon: On Programming</title>
+        <link rel="stylesheet" href="/style.css" />
+        <meta name="description" content="Blog on Software Development, Computer Science, Quality Assurance and Related Matter"/>
+
+        <!--[if IE 7]><link rel="stylesheet" href="/resources/fontello/css/fontello-ie7.css"><![endif]-->
+    </head>
+
+    <body>
+        <header>
+            <h1><a href="/">Bill Laboon: On Programming</a></h1>
+                <h4>Blog on Software Development, Computer Science, Quality Assurance and Related Matter</h4>
+
+	    <p>[<a title="[GitHub]" href="http://www.github.com/laboon">Github</a>]
+	       [<a title="[Twitter]" href="https://twitter.com/billlaboon">Twitter</a>]
+	       [<a title="[Infinite Viral]" href="http://infiniteviral.com">Infinite Viral</a>]</p>
+
+            <hr />
+        </header>
+
+        <main>
+
+            <p>One of the things that I've noticed about functional programming, and Haskell in particular, is that it really makes you think about the problem in order to get a good solution.  Programming in general is often punctuated with long stretches of what seem to be wasted brain cycles with brief flashes of inspiration.  Functional programming seems to be this to the nth power, but those brief flashes lead to incredibly elegant code.  Those brief flashes are also becoming more and more regular as I get used to the functional way of thinking.</p>
+
+<p>Tonight, I was working on Problem 16 of Project Euler:</p>
+
+<p>2<sup>15</sup> = 32768 and the sum of its digits is 3 + 2 + 7 + 6 + 8 = 26.</p>
+
+<p>What is the sum of the digits of the number 2<sup>1000</sup>?</p>
+
+<p>Solving this involved only three lines of code – and two of them are descriptive, as opposed to actual execution steps.</p>
+
+<p>So… where to start?  I knew that I was going to need to turn the value of 2<sup>1000</sup> into a String (which is really just a list of Chars), and then convert each of those individual chars into an integer (e.g., “1″ becomes 1, “2″ becomes 2, etc.).  Once I had that, I knew it would be a relatively simple process to sum everything up – this is what the fold commands are made for.</p>
+
+<p>My first question was how to convert a number into a string.  A quick bit of googling led me to show.  That's a pretty useful command – it takes any type that can be shown and turns it into a string (which in Haskell is just a list of chars).</p>
+
+<pre><code class="haskell">*Main Data.Char&gt; :t show
+show :: Show a =&gt; a -&gt; String
+</code></pre>
+
+<p>Now I have converted 2<sup>1000</sup> into “1071508607186267320948425049060001810... (lots of digits) ...37205668069376″.  Technically, of course, this is ['1', '0', '7'... '6'].  The next step was to convert each of these characters into an integer instead of a character which represented an integer.  Again, very simple – the map command was made for such cases.  That raised the question, however – what function do I need to pass in to the map command?  I tried everything I could think of – read, fromEnum, fromIntegral – before finally giving up and Googling it.</p>
+
+<p>Google wasn't of much help – but Hoogle was.  If you've never used Hoogle, I highly recommend it.  It's a way to search Haskell functions by the types that they accept and output.  I knew I needed to take a Char and return an Int, so I searched for:</p>
+
+<pre><code>Char -&gt; Int
+</code></pre>
+
+<p>and the digitToInt command was the first result!  I would need to import Data.Char to use it, but I like this method of finding functions more than searching through the massive Java API.  I imported Data.Char and went on my merry way.</p>
+
+<p>Now I had a list of integers – [1,0,7... 6].  It was absolutely trivial to fold them together via addition, then add the function definition (which Haskell will, of course, do for you if you don't want to).  This led me to the final three-line program, with only one line of actual execution.</p>
+
+<pre><code>import Data.Char
+
+digitSum :: Show a =&gt; a -&gt; Int
+digitSum n = foldr (+) 0 (map (digitToInt) (show n))
+</code></pre>
+
+<p>One line to sum up all the digits in an arbitrary-length number. Now that is elegant.</p>
+
+
+        </main>
+
+        <footer>
+            <hr />
+            <p>&copy; <time>2014</time> Bill Laboon</p>
+        </footer>
+
+        <script src="/scripts.js"></script>
+    </body>
+
+</html>

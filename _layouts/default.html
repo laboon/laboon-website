@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>{% if page.title %} {{ page.title }} | {% endif %} {{ site.name }}</title>
+        <link rel="stylesheet" href="{{site.baseurl}}/style.css" />
+        <meta name="description" content="{{site.description}}"/>
+
+        <!--[if IE 7]><link rel="stylesheet" href="{{site.baseurl}}/resources/fontello/css/fontello-ie7.css"><![endif]-->
+    </head>
+
+    <body>
+        <header>
+            <h1><a href="{{site.baseurl}}/">{{ site.name }}</a></h1>
+                <h4>{{ site.description }}</h4>
+
+	    <p>[<a title="[GitHub]" href="http://www.github.com/laboon">Github</a>]
+	       [<a title="[Twitter]" href="https://twitter.com/billlaboon">Twitter</a>]
+	       [<a title="[Infinite Viral]" href="http://infiniteviral.com">Infinite Viral</a>]</p>
+
+            <hr />
+        </header>
+
+        <main>
+
+            {{ content }}
+
+        </main>
+
+        <footer>
+            <hr />
+            <p>&copy; <time>2014</time> Bill Laboon</p>
+        </footer>
+
+        <script src="{{site.baseurl}}/scripts.js"></script>
+    </body>
+
+</html>

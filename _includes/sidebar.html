@@ -1,0 +1,14 @@
+<h3>About Me</h3>
+<p>Software development by day, and more software development by night.
+
+<p><a title="[GitHub]" href="http://www.github.com/laboon">[Github]</a> <a title="[Twitter]" href="https://twitter.com/billlaboon">[Twitter]</a>
+
+<p>Projects
+<p> <a title="[Infinite Viral]" href="http://infiniteviral.com">[Infinite Viral]</a>
+
+<h3>Recent Posts</h3>
+<ul>
+  {% for post in site.posts limit: 3 %}
+    <li><a href="{{ post.url }}">{{ post.title }}</a></li>
+  {% endfor %}
+</ul>

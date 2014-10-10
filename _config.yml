@@ -1,0 +1,11 @@
+name: "Bill Laboon: On Programming"
+description: "Blog on Software Development, Computer Science, Quality Assurance and Related Matter"
+author: "Bill Laboon"
+
+url: "http://localhost:4000"
+
+paginate: 10
+
+markdown: rdiscount
+permalink: pretty
+highlighter: pygments
